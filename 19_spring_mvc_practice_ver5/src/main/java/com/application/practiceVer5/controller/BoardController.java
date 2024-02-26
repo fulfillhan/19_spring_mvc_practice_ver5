@@ -57,11 +57,79 @@ public class BoardController {
 	@GetMapping("/authentication")
 	public String authentication(Model model ,@RequestParam("boardId") long boardId, @RequestParam("menu") String menu) {
 		model.addAttribute("boardDTO",boardService.getBoardDetail(boardId));
-		
+		model.addAttribute("menu", menu);// 잊지말기!
 		return "board/authentication";
 	}
 	
-	
-	
+	@PostMapping("/authentication")
+	@ResponseBody
+	public String authentication(@ModelAttribute BoardDTO boardDTO, @RequestParam("menu") String menu) {
 
+		boolean isAuthorized = boardService.isAuthorized(boardDTO);
+		String jsScript = "";
+		if (isAuthorized) {
+			if(menu.equals("delete")) {
+				jsScript="<script>";
+				jsScript += "location.href='/board/deleteBoard?boardId="+boardDTO.getBoardId()+"';";
+				jsScript += "</script>";
+				
+			}else if(menu.equals("update")) {
+				jsScript="<script>";
+				jsScript += "location.href='/board/updateBoard?boardId="+boardDTO.getBoardId()+"';";
+				jsScript += "</script>";
+			}
+		} else {
+			jsScript = """
+					<script>
+					alert('패스워드를 확인하세요');
+					history.go(-1);
+					</script>
+					""";
+		}
+		return jsScript;
+
+	}
+	
+	@GetMapping("/updateBoard")
+	public String updateBoard(Model model, @RequestParam("boardId") long boardId) {
+		model.addAttribute("boardDTO", boardService.getBoardDetail(boardId));
+		
+		return "board/updateBoard";
+	}
+
+	@PostMapping("/updateBoard")
+	@ResponseBody
+	public String updateBoard(@ModelAttribute BoardDTO boardDTO) {
+		boardService.updateBoard(boardDTO);
+		String jsScript = """
+				<script>
+					alert('게시글이 수정되었습니다.');
+					location.href='/board/boardList';
+					</script>
+				""";
+		return jsScript;
+	}
+
+	@GetMapping("/deleteBoard")
+	public String deleteBoard(Model model, @RequestParam("boardId") long boardId) {
+		model.addAttribute("boardId", boardId);
+		//System.out.println(boardId);
+		
+		return "board/deleteBoard";
+	}
+
+	@PostMapping("/deleteBoard")
+	@ResponseBody
+	public String deleteBoard(@RequestParam("boardId") long boardId) {
+		boardService.deleteBoard(boardId);
+		String jsScript = """
+				<script>
+				alert('게시글이 삭제되었습니다..');
+				location.href='/board/boardList';
+				</script>
+				""";
+		return jsScript;
+	}
 }
+
+

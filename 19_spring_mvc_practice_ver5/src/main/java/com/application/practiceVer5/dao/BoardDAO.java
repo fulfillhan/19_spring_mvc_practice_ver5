@@ -15,4 +15,12 @@ public interface BoardDAO {
 
 	public BoardDTO getBoardDetail(long boardId);
 
+	public String getEncodedPasswd(long boardId);
+
+	public BoardDTO updateBoard(long boardId);
+
+	public void updateBoard(BoardDTO boardDTO);
+
+	public void deleteBoard(long boardId);
+
 }

@@ -35,4 +35,30 @@ public class BoardServiceImple implements BoardService {
 		
 		return boardDAO.getBoardDetail(boardId);
 	}
+
+	@Override
+	public boolean isAuthorized(BoardDTO boardDTO) {
+
+		boolean isCheck = false;
+		// 암호화된 패스워드 가져오기
+		String encodedPasswd = boardDAO.getEncodedPasswd(boardDTO.getBoardId());
+
+		if (passwordEncoder.matches(boardDTO.getPasswd(), encodedPasswd)) {
+			isCheck = true;
+		}
+
+		return isCheck;
+	}
+
+	@Override
+	public void updateBoard(BoardDTO boardDTO) {
+	boardDAO.updateBoard(boardDTO);
+	}
+
+	@Override
+	public void deleteBoard(long boardId) {
+		boardDAO.deleteBoard(boardId);
+	}
+
+	
 }
